@@ -6,6 +6,7 @@ from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
 from keras.layers import LSTM, Dense
 
+
 # Function to fetch stock data for a given symbol
 def get_stock_data(stock_symbol):
     try:
@@ -18,6 +19,7 @@ def get_stock_data(stock_symbol):
         print(f"Error: {e}")
         return None
 
+
 # Define the date range
 start_date = "2018-01-01"
 end_date = "2023-11-05"
@@ -28,6 +30,7 @@ while True:
     df = get_stock_data(stock_symbol)
     if df is not None:
         break  # Valid symbol, exit the loop
+
 
 # Create a MinMaxScaler to scale the data
 scaler = MinMaxScaler()
@@ -85,3 +88,5 @@ plt.ylabel('Stock Price')
 plt.show()
 
 print(f"Predicted stock price for one day: {predicted_price}")
+
+

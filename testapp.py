@@ -2,14 +2,12 @@ import matplotlib
 import yfinance as yf
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
-from keras.models import Sequential, load_model
+from keras.models import Sequential
 from keras.layers import LSTM, Dense
 from flask import Flask, request, render_template
 import matplotlib.pyplot as plt
 from io import BytesIO
 import base64
-import os
-
 
 matplotlib.use('Agg')
 app = Flask(__name__)
@@ -24,22 +22,6 @@ def get_stock_data(stock_symbol, start_date, end_date):
         return df, None
     except Exception as e:
         return None, str(e)
-
-
-# Function to Create and/or load model
-
-def create_or_load_model(stock_symbol, sequence_length, input_shape):
-    model_path = f'models/{stock_symbol}.h5'
-    if os.path.exists(model_path):
-        model = load_model(model_path)
-    else:
-        model = Sequential()
-        model.add(LSTM(50, return_sequences=True, input_shape=input_shape))
-        model.add(LSTM(50, return_sequences=False))
-        model.add(Dense(25))
-        model.add(Dense(1))
-        model.compile(optimizer='adam', loss='mean_squared_error')
-    return model
 
 
 # Function to predict stock price for a given number of days
@@ -70,19 +52,19 @@ def predict_stock_price(stock_symbol, start_date, end_date, sequence_length, day
     test_data = data[split_index:]
     test_target = target[split_index:]
 
-    # Create or load the model
-    model = create_or_load_model(stock_symbol, sequence_length, (sequence_length, 1))
+    # Build and train the LSTM model
+    model = Sequential()
+    model.add(LSTM(50, return_sequences=True, input_shape=(sequence_length, 1)))
+    model.add(LSTM(50, return_sequences=False))
+    model.add(Dense(25))
+    model.add(Dense(1))
 
-    # Train the model only if it's newly created
-    if not os.path.exists(f'models/{stock_symbol}.keras'):
-        model.compile(optimizer='adam', loss='mean_squared_error')
-        model.fit(train_data, train_target, batch_size=64, epochs=20)
-        if not os.path.exists('models'):
-            os.makedirs('models')
-        model.save(f'models/{stock_symbol}.keras')
+    model.compile(optimizer='adam', loss='mean_squared_error')
+
+    model.fit(train_data, train_target, batch_size=64, epochs=20)
 
     # Predict stock prices for the available historical data
-    predictions = model.predict(data)
+    predictions = model.predict(data)  # Predict using historical data
     predicted_prices = scaler.inverse_transform(predictions)
 
     return predicted_prices, None
