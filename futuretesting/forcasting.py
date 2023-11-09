@@ -50,8 +50,8 @@ def predict_stock_price(stock_symbol, start_date, end_date, sequence_length):
         model.compile(optimizer='adam', loss='mean_squared_error')
         model.fit(data, scaled_data[sequence_length:], epochs=20, batch_size=32)
 
-        if not os.path.exists('models'):
-            os.makedirs('models')
+        if not os.path.exists('../models'):
+            os.makedirs('../models')
         model.save(model_path)
     else:
         model = load_model(model_path)
