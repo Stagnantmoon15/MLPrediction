@@ -79,6 +79,7 @@ while True:
 # Predict stock prices for the available historical data
 predicted_prices = predict_stock_price(stock_symbol, start_date, end_date, sequence_length, 0)
 
+
 # Plot the historical and predicted stock price data
 plt.figure(figsize=(12, 6))
 plt.plot(df.index, df['Adj Close'], label='Historical Data', color='blue')

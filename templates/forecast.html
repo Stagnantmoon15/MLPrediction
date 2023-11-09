@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>30-Day Stock Forecast</title>
+</head>
+<body>
+    <h1>30-Day Stock Forecast</h1>
+    <form method="post">
+        <label for="stock_symbol">Stock Symbol:</label>
+        <input type="text" id="stock_symbol" name="stock_symbol">
+        <input type="submit" value="Forecast">
+    </form>
+    {% if forecast %}
+        <h2>Forecasted Prices</h2>
+        <ul>
+            {% for price in forecast %}
+                <li>{{ price }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
