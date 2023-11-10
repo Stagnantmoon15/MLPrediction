@@ -50,5 +50,5 @@ The LSTM model is designed to predict stock prices based on historical data. It 
 
 ## Additional Resources
 - For more insights and understanding of stock price prediction using LSTM, check out this helpful video https://www.youtube.com/watch?v=R11_mg9R02c.
-- What used for Deployment see here: https://github.com/Stagnantmoon15/StockMLWebApp
+- What we tried to use for Deployment as a test see here: https://github.com/Stagnantmoon15/StockMLWebApp
 
