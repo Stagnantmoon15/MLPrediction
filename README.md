@@ -48,4 +48,6 @@ The LSTM model is designed to predict stock prices based on historical data. It 
 - Predictions are based solely on historical price data and do not consider other market factors.
 - The model's accuracy is not guaranteed and should not be used for actual trading decisions.
 
+## Additional Resources
+For more insights and understanding of stock price prediction using LSTM, check out this helpful video https://www.youtube.com/watch?v=R11_mg9R02c.
 
