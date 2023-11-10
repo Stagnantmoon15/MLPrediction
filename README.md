@@ -49,5 +49,6 @@ The LSTM model is designed to predict stock prices based on historical data. It 
 - The model's accuracy is not guaranteed and should not be used for actual trading decisions.
 
 ## Additional Resources
-For more insights and understanding of stock price prediction using LSTM, check out this helpful video https://www.youtube.com/watch?v=R11_mg9R02c.
+- For more insights and understanding of stock price prediction using LSTM, check out this helpful video https://www.youtube.com/watch?v=R11_mg9R02c.
+- What used for Deployment see here: https://github.com/Stagnantmoon15/StockMLWebApp
 
