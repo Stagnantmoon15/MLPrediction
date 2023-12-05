@@ -47,3 +47,15 @@ img {
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+
+table {
+    margin: 20px auto; /* Centers the table horizontally */
+    width: 80%; /* Adjust the width as needed */
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}

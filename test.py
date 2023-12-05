@@ -9,10 +9,12 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 import base64
 
+
 matplotlib.use('Agg')
 app = Flask(__name__)
 
 
+# Function to fetch stock data for a given symbol
 def get_stock_data(stock_symbol, start_date, end_date):
     try:
         df = yf.download(stock_symbol, start=start_date, end=end_date)
@@ -23,24 +25,8 @@ def get_stock_data(stock_symbol, start_date, end_date):
         return None, str(e)
 
 
-def predict_future_prices(model, last_sequence, days_to_predict, scaler):
-    future_predictions = []
-    current_sequence = last_sequence.copy()
-
-    for _ in range(days_to_predict):
-        current_sequence_reshaped = np.array(current_sequence).reshape(1, -1, 1)
-        next_day_prediction = model.predict(current_sequence_reshaped)
-        future_predictions.append(next_day_prediction[0][0])
-        current_sequence.append(next_day_prediction[0][0])
-        current_sequence.pop(0)
-
-    future_predictions = np.array(future_predictions).reshape(-1, 1)
-    future_predictions = scaler.inverse_transform(future_predictions)
-
-    return future_predictions
-
-
-def predict_stock_price(stock_symbol, start_date, end_date, sequence_length):
+# Function to predict stock price for a given number of days
+def predict_stock_price(stock_symbol, start_date, end_date, sequence_length, days):
     df, error_message = get_stock_data(stock_symbol, start_date, end_date)
     if df is None:
         return None, error_message
@@ -73,14 +59,16 @@ def predict_stock_price(stock_symbol, start_date, end_date, sequence_length):
     model.add(LSTM(50, return_sequences=False))
     model.add(Dense(25))
     model.add(Dense(1))
+
     model.compile(optimizer='adam', loss='mean_squared_error')
+
     model.fit(train_data, train_target, batch_size=64, epochs=20)
 
-    # Prepare for future price prediction
-    last_sequence = list(df['Adj Close'].values[-sequence_length:])
-    future_prices = predict_future_prices(model, last_sequence, 90, scaler)
+    # Predict stock prices for the available historical data
+    predictions = model.predict(data)  # Predict using historical data
+    predicted_prices = scaler.inverse_transform(predictions)
 
-    return future_prices, None
+    return predicted_prices, None
 
 
 # Define the stock symbol and date range
@@ -93,19 +81,16 @@ sequence_length = 30
 def index():
     if request.method == "POST":
         stock_symbol = request.form["stock_symbol"]
-        df, error_message = get_stock_data(stock_symbol, start_date, end_date)
+        df, error_message = get_stock_data(stock_symbol, start_date, end_date)  # Fetch stock data
         if df is not None:
-            future_prices, error_message = predict_stock_price(stock_symbol, start_date, end_date, sequence_length)
+            predicted_prices, error_message = predict_stock_price(stock_symbol, start_date, end_date, sequence_length, 0)
 
-            if future_prices is not None:
-                day_30_prediction = future_prices[29][0]
-                day_60_prediction = future_prices[59][0]
-                day_90_prediction = future_prices[89][0]
-
+            if predicted_prices is not None:
                 # Plot the historical and predicted stock price data
                 plt.figure(figsize=(12, 6))
                 plt.plot(df.index, df['Adj Close'], label='Historical Data', color='blue')
-                plt.title(f'Historical Stock Prices for {stock_symbol}')
+                plt.plot(df.index[sequence_length:], predicted_prices, label='Predicted Data', color='red', linestyle='--')
+                plt.title(f'Historical vs Predicted Stock Prices for {stock_symbol}')
                 plt.xlabel('Date')
                 plt.ylabel('Adjusted Close Price')
                 plt.legend()
@@ -118,8 +103,8 @@ def index():
                 img_data = base64.b64encode(img_buf.read()).decode()
                 plt.close()
 
-                return render_template("index.html", plot=img_data, day_30=day_30_prediction, day_60=day_60_prediction,
-                                       day_90=day_90_prediction)
+                return render_template("index.html", plot=img_data)
+
             else:
                 return render_template("index.html", error_message=error_message)
 
@@ -128,3 +113,5 @@ def index():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
